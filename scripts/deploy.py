@@ -1,4 +1,4 @@
-from brownie import NftFactory, network, config
+from brownie import NftFactory, network, config, address
 from scripts.helpful_scripts import get_account
 from metadata.sample_metadata import metadata_template
 from pathlib import Path
@@ -18,7 +18,7 @@ def upload_to_ipfs(filepath):
         filename = filepath.split("/")[-1:][0]
         image_uri = f"https://ipfs.io/ipfs/{ipfs_hash}?filename={filename}"
         print(image_uri)
-        return image_uri
+    return image_uri
 
 def create_metadata():
     metadata = metadata_template
@@ -44,7 +44,8 @@ def main():
         with open(metadata_file_name, "w") as file:
             json.dump(metadata, file)
         token_uri = upload_to_ipfs(metadata_file_name)
-    tx = nft_generator.setTokenURI(count, token_uri, {"from": account})
+        print(metadata)
+    tx = nft_generator.setTokenURI(count, metadata, {"from": account})
     tx.wait(1)
     print('NFT published!')
-    print(f'https://testnets.opensea.io/assets/{nft}/{count}')
+    print(f'https://testnets.opensea.io/assets/{nft_generator.address}/{count}')
