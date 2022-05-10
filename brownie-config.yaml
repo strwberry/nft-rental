@@ -1,0 +1,21 @@
+dotenv: .env
+dependencies:
+  - OpenZeppelin/openzeppelin-contracts@4.6.0
+  # - smartcontractkit/chainlink@1.3.0
+
+compiler:
+  solc:
+    remappings:
+      - '@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.6.0'
+      # - '@chainlink=smartcontractkit/chainlink@1.3.0'
+wallets:
+  from_key: ${PRIVATE_KEY}
+  
+networks:
+  default: rinkeby
+  rinkeby: 
+    eth_usd_price_feed: '0x8A753747A1Fa494EC906cE90E9f37563A8AF630e'
+    vrf_address: '0x6168499c0cFfCaCD319c818142124B7A15E857ab'
+    key_hash: '0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc'
+    link_token: '0x01BE23585060835E02B77ef475b0Cc51aA1e0709'
+    verify: True
