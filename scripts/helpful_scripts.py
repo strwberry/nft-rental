@@ -1,15 +1,8 @@
-from brownie import (
-    network,
-    accounts,
-    config,
-    # MockV3Aggregator,
-    # VRFCoordinatorV2Mock,
-    # LinkToken,
-)
-
+from brownie import network, accounts, config
+from pathlib import Path
+from metadata.sample_metadata import metadata_template
+import requests
 LOCAL_BLOCKCHAIN_ENVIRONMENT = ["development", "ganache-local"]
-BASE_FEE = 1000000000000000000
-GAS_PRICE_LINK = "0x0"
 
 
 def get_account():
@@ -19,32 +12,22 @@ def get_account():
         return accounts.add(config["wallets"]["from_key"])
 
 
-# def get_price_feed_address():
-#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENT:
-#         return config["networks"][network.show_active()]["eth_usd_price_feed"]
-#     else:
-#         MockV3Aggregator.deploy(8, 344400000000, {"from": accounts[0]})
-#         return MockV3Aggregator[-1].address
+def upload_to_ipfs(filepath):
+    with Path(filepath).open("rb") as fp:
+        image_binary = fp.read()
+        ipfs_url = "http://127.0.0.1:5001"
+        endpoint = "/api/v0/add"
+        response = requests.post(ipfs_url + endpoint, files={"file": image_binary})
+        ipfs_hash = response.json()["Hash"]
+        filename = filepath.split("/")[-1:][0]
+        image_uri = f"https://ipfs.io/ipfs/{ipfs_hash}?filename={filename}"
+        print(image_uri)
+    return image_uri
 
-
-# def get_VRF_address():
-#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENT:
-#         return config["networks"][network.show_active()]["vrf_address"]
-#     else:
-#         VRFCoordinatorV2Mock.deploy(BASE_FEE, GAS_PRICE_LINK, {"from": accounts[0]})
-#         return VRFCoordinatorV2Mock[-1].address
-
-
-# def get_key_hash():
-#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENT:
-#         return config["networks"][network.show_active()]["key_hash"]
-#     else:
-#         return "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc"
-
-
-# def get_link_token_address():
-#     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENT:
-#         return config["networks"][network.show_active()]["link_token"]
-#     else:
-#         LinkToken.deploy({"from": accounts[0]})
-#         return LinkToken[-1].address
+def create_metadata():
+    metadata = metadata_template
+    metadata["properties"]["name"]["description"] = "Bobby the beast"
+    metadata["properties"]["description"]["description"] = "Bobby is a wild beast with a big heart"
+    filepath = "./img/image_1.png"
+    metadata["properties"]["image"]["description"] = upload_to_ipfs(filepath)
+    return metadata

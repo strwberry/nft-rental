@@ -5,11 +5,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract NftFactory is ERC721URIStorage {
-    uint256 public counter = 0;
+    uint256 public counter;
     address owner;
 
     constructor() public ERC721("Non Fungible Token", "NFT") {
         owner = msg.sender;
+        counter = 0;
     }
 
     function createNft(address recipient) public returns (uint256) {
@@ -19,7 +20,7 @@ contract NftFactory is ERC721URIStorage {
         return tokenId;
     }
 
-    function setTokenURI(uint256 tokenId, string memory uri) public {
-        _setTokenURI(tokenId, uri);
+    function setTokenURI(uint256 tokenId, string memory tokenURI) public {
+        _setTokenURI(tokenId, tokenURI);
     }
 }
